@@ -36,6 +36,9 @@ export function CartProvider({ children }: CartProviderProps) {
     localStorage.setItem('@RocketShoes:cart', JSON.stringify(cartProducts))
   }
 
+  const isSomeCartProduct = (productId: number) =>
+    cart.some(product => product.id === productId)
+
   const addProduct = async (productId: number) => {
     try {
       const { data: stock } = await api.get<Stock>(`/stock/${productId}`)
