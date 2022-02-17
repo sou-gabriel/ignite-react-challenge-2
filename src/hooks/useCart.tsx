@@ -32,7 +32,7 @@ export function CartProvider({ children }: CartProviderProps) {
     return []
   })
 
-  const storeCarProductsInLocalStorage = (cartProducts: Product[]) => {
+  const storeCartProductsInLocalStorage = (cartProducts: Product[]) => {
     localStorage.setItem('@RocketShoes:cart', JSON.stringify(cartProducts))
   }
 
@@ -69,7 +69,7 @@ export function CartProvider({ children }: CartProviderProps) {
           setCart(prevProducts => {
             const updatedProductAmount =
               increaseProductAmountInCart(prevProducts)
-            storeCarProductsInLocalStorage(updatedProductAmount)
+            storeCartProductsInLocalStorage(updatedProductAmount)
 
             return updatedProductAmount
           })
@@ -80,7 +80,7 @@ export function CartProvider({ children }: CartProviderProps) {
           const newProduct = { ...product, amount: 1 }
           const updatedCarProducts = [...prevProducts, newProduct]
 
-          storeCarProductsInLocalStorage(updatedCarProducts)
+          storeCartProductsInLocalStorage(updatedCarProducts)
 
           return updatedCarProducts
         })
