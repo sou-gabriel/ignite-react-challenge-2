@@ -58,9 +58,7 @@ export function CartProvider({ children }: CartProviderProps) {
       const { data: product } = await api.get<Product>(`/products/${productId}`)
 
       if (product) {
-        const isSomeCartProduct = cart.some(product => product.id === productId)
-
-        if (isSomeCartProduct) {
+        if (isSomeCartProduct(productId)) {
           const increaseProductAmountInCart = (carProducts: Product[]) => {
             return carProducts.map(carProduct =>
               carProduct.id === productId
