@@ -114,7 +114,7 @@ export function CartProvider({ children }: CartProviderProps) {
     amount,
   }: UpdateProductAmount) => {
     try {
-      const isAnInvalidAmount = amount <= 1
+      const isAnInvalidAmount = amount <= 0
 
       if (isAnInvalidAmount) {
         return
@@ -125,7 +125,7 @@ export function CartProvider({ children }: CartProviderProps) {
       const cartProduct = cart.find(product => product.id === productId)
 
       if (cartProduct) {
-        if (stock.amount <= cartProduct.amount) {
+        if (amount > stock.amount) {
           toast.error('Quantidade solicitada fora de estoque')
           return
         }
