@@ -25,6 +25,12 @@ const Cart = () => {
     subTotal: formatPrice(product.price * product.amount),
   }))
 
+  const total = formatPrice(
+    cart.reduce((acc, product) => {
+      return acc + product.price
+    }, 0)
+  )
+
   function handleProductIncrement (product: Product) {
     // TODO
   }
