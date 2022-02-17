@@ -93,9 +93,19 @@ export function CartProvider({ children }: CartProviderProps) {
 
   const removeProduct = (productId: number) => {
     try {
-      // TODO
+      if (!isSomeCartProduct(productId)) {
+        throw Error
+      }
+
+      setCart(prevProducts => {
+        const filteredProductsFromCart = prevProducts.filter(
+          prevProduct => prevProduct.id !== productId
+        )
+        storeCartProductsInLocalStorage(filteredProductsFromCart)
+        return filteredProductsFromCart
+      })
     } catch {
-      // TODO
+      toast.error('Erro na remoção do produto')
     }
   }
 
