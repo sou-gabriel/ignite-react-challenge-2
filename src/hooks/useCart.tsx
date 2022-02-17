@@ -114,9 +114,36 @@ export function CartProvider({ children }: CartProviderProps) {
     amount,
   }: UpdateProductAmount) => {
     try {
-      // TODO
+      const isAnInvalidAmount = amount <= 1
+
+      if (isAnInvalidAmount) {
+        return
+      }
+
+      const { data: stock } = await api.get<Stock>(`/stock/${productId}`)
+
+      const cartProduct = cart.find(product => product.id === productId)
+
+      if (cartProduct) {
+        if (stock.amount <= cartProduct.amount) {
+          toast.error('Quantidade solicitada fora de estoque')
+          return
+        }
+      }
+
+      setCart(prevProducts => {
+        const updatedCartProducts = prevProducts.map(prevProduct => {
+          return prevProduct.id === productId
+            ? { ...prevProduct, amount }
+            : prevProduct
+        })
+
+        storeCartProductsInLocalStorage(updatedCartProducts)
+
+        return updatedCartProducts
+      })
     } catch {
-      // TODO
+      toast.error('Erro na alteração de quantidade do produto')
     }
   }
 
