@@ -21,7 +21,7 @@ interface CartContextData {
 
 const CartContext = createContext<CartContextData>({} as CartContextData)
 
-export function CartProvider ({ children }: CartProviderProps) {
+export function CartProvider({ children }: CartProviderProps) {
   const [cart, setCart] = useState<Product[]>(() => {
     const storagedCart = localStorage.getItem('@RocketShoes:cart')
 
@@ -32,11 +32,61 @@ export function CartProvider ({ children }: CartProviderProps) {
     return []
   })
 
+  const storeCarProductsInLocalStorage = (cartProducts: Product[]) => {
+    localStorage.setItem('@RocketShoes:cart', JSON.stringify(cartProducts))
+  }
+
   const addProduct = async (productId: number) => {
     try {
-      // TODO
+      const { data: stock } = await api.get<Stock>(`/stock/${productId}`)
+
+      const cartProduct = cart.find(product => product.id === productId)
+
+      if (cartProduct) {
+        const thereIsNoMoreSpaceInTheProductStock =
+          stock.amount <= cartProduct.amount
+
+        if (thereIsNoMoreSpaceInTheProductStock) {
+          toast.error('Quantidade solicitada fora de estoque')
+          return
+        }
+      }
+
+      const { data: product } = await api.get<Product>(`/products/${productId}`)
+
+      if (product) {
+        const isSomeCartProduct = cart.some(product => product.id === productId)
+
+        if (isSomeCartProduct) {
+          const increaseProductAmountInCart = (carProducts: Product[]) => {
+            return carProducts.map(carProduct =>
+              carProduct.id === productId
+                ? { ...carProduct, amount: carProduct.amount + 1 }
+                : carProduct
+            )
+          }
+
+          setCart(prevProducts => {
+            const updatedProductAmount =
+              increaseProductAmountInCart(prevProducts)
+            storeCarProductsInLocalStorage(updatedProductAmount)
+
+            return updatedProductAmount
+          })
+          return
+        }
+
+        setCart(prevProducts => {
+          const newProduct = { ...product, amount: 1 }
+          const updatedCarProducts = [...prevProducts, newProduct]
+
+          storeCarProductsInLocalStorage(updatedCarProducts)
+
+          return updatedCarProducts
+        })
+      }
     } catch {
-      // TODO
+      toast.error('Erro na adição do produto')
     }
   }
 
@@ -68,7 +118,7 @@ export function CartProvider ({ children }: CartProviderProps) {
   )
 }
 
-export function useCart (): CartContextData {
+export function useCart(): CartContextData {
   const context = useContext(CartContext)
 
   return context
